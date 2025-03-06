@@ -1,0 +1,2 @@
+# shta
+Spamhouse test assignment
