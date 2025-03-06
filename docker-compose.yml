@@ -1,0 +1,50 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./config.yml:/app/config.yml
+    environment:
+      - CONFIG=/app/config.yml
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-appuser}
+      - DB_PASSWORD=${DB_PASSWORD:-sEcRetPaSs8371238642}
+      - DB_NAME=${DB_NAME:-appdb}
+
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      # Default admin credentials
+      POSTGRES_USER: ${PG_USER:-admin}
+      POSTGRES_PASSWORD: ${PG_PASSWORD:-adminpass}
+      POSTGRES_DB: ${PG_DB:-postgres}
+      # App user credentials
+      APP_DB_USER: ${DB_USER:-appuser}
+      APP_DB_PASSWORD: ${DB_PASSWORD:-sEcRetPaSs8371238642}
+      APP_DB_NAME: ${DB_NAME:-appdb}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./scripts/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+volumes:
+  pgdata:
+  redisdata:
