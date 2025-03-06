@@ -39,7 +39,7 @@ func (s *Storage) GetURLs(sortBy, sortDir string) (*URLList, error) {
 
 	switch sortBy {
 	case "frequency":
-		sort = "counter"
+		sort = "seen"
 	case "time":
 		sort = "created_at"
 	default:
