@@ -1,3 +1,5 @@
+[![CI](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml)
+
 # Spamhaus Test Assignment
 
 Spamhaus test assignment (details [here](ASSIGNMENT.md)).
