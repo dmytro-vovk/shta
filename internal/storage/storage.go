@@ -53,23 +53,18 @@ func (s *Storage) GetURLs(sortBy, sortOrder string) (*types.URLList, error) {
 		}
 	}
 
-	var (
-		timeSort = func(i, j int) bool {
+	switch sortBy {
+	case types.SortByTime:
+		sort.Slice(sorted, func(i, j int) bool {
 			return sorted[i].Seen.After(sorted[j].Seen)
-		}
-		frequencySort = func(i, j int) bool {
+		})
+	case types.SortByFrequency:
+		sort.Slice(sorted, func(i, j int) bool {
 			return sorted[i].Count > sorted[j].Count
-		}
-	)
-
-	switch {
-	case sortBy == "time":
-		sort.Slice(sorted, timeSort)
-	case sortBy == "frequency":
-		sort.Slice(sorted, frequencySort)
+		})
 	}
 
-	if sortOrder == "asc" {
+	if sortOrder == types.OrderAsc {
 		slices.Reverse(sorted)
 	}
 

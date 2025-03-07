@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/dmytro-vovk/shta/internal/types"
 )
 
 func (h *Handlers) LatestURLs(w http.ResponseWriter, r *http.Request) {
@@ -12,29 +14,19 @@ func (h *Handlers) LatestURLs(w http.ResponseWriter, r *http.Request) {
 		sortDir string
 	)
 
-	sort := r.URL.Query().Get("sort")
-
-	const (
-		frequency = "frequency"
-		time      = "time"
-		asc       = "asc"
-		desc      = "desc"
-	)
-
-	switch sort {
+	switch sort := r.URL.Query().Get("sort"); sort {
 	case "frequency,asc":
-		sortBy, sortDir = frequency, asc
+		sortBy, sortDir = types.SortByFrequency, types.OrderAsc
 	case "frequency,desc":
-		sortBy, sortDir = frequency, desc
+		sortBy, sortDir = types.SortByFrequency, types.OrderDesc
 	case "time,asc":
-		sortBy, sortDir = time, asc
+		sortBy, sortDir = types.SortByTime, types.OrderAsc
 	case "time,desc":
-		sortBy, sortDir = time, desc
+		sortBy, sortDir = types.SortByTime, types.OrderDesc
 	case "":
-		sortBy, sortDir = frequency, asc
+		sortBy, sortDir = types.SortByFrequency, types.OrderAsc
 	default:
 		http.Error(w, "Invalid sort parameter: "+sort, http.StatusBadRequest)
-
 		log.Printf("Error: invalid sort parameter: %s", sort)
 
 		return
@@ -43,7 +35,6 @@ func (h *Handlers) LatestURLs(w http.ResponseWriter, r *http.Request) {
 	data, err := h.reader.GetURLs(sortBy, sortDir)
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-
 		log.Printf("Error getting URLs: %s", err)
 
 		return

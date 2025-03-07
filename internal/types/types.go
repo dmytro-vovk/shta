@@ -17,3 +17,10 @@ type URLList struct {
 		Order string `json:"order"` // Sort order
 	} `json:"sort"`
 }
+
+const (
+	SortByFrequency = "frequency"
+	SortByTime      = "time"
+	OrderAsc        = "asc"
+	OrderDesc       = "desc"
+)
