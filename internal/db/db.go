@@ -1,12 +1,10 @@
 package db
 
 import (
-	_ "database/sql"
 	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 type DB struct {
@@ -30,13 +28,9 @@ func New(dsn string) (*DB, error) {
 
 func (db *DB) UpsertURL(url string) error {
 	_, err := db.db.Exec(`
-		INSERT INTO urls (
-			url
-		) VALUES (
-			$1
-		)
-		ON CONFLICT (url) DO UPDATE 
-			SET seen = urls.seen + 1`,
+		INSERT INTO urls (url) VALUES ($1)
+		ON CONFLICT (url) DO
+		UPDATE SET last_seen = NOW()`,
 		url,
 	)
 
@@ -44,20 +38,19 @@ func (db *DB) UpsertURL(url string) error {
 }
 
 type URLRecord struct {
-	Created time.Time `db:"created_at" json:"created"`
-	URL     string    `db:"url"        json:"url"`
-	Seen    int64     `db:"seen"       json:"seen"`
+	URL      string    `db:"url"`
+	LastSeen time.Time `db:"last_seen"`
 }
 
-func (db *DB) FetchURLs(sortBy, order string, limit int) ([]URLRecord, error) {
-	var data []URLRecord
+func (db *DB) FetchURLs(limit int) ([]*URLRecord, error) {
+	var data []*URLRecord
 
 	if err := db.db.Select(
 		&data,
-		`SELECT url, seen, created_at FROM urls ORDER BY `+sortBy+` `+order+` LIMIT $1`,
+		`SELECT url, last_seen FROM urls ORDER BY last_seen DESC LIMIT $1`,
 		limit,
 	); err != nil {
-		return nil, fmt.Errorf("fetch urls: %w", err)
+		return nil, err
 	}
 
 	return data, nil

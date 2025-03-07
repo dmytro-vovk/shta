@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/dmytro-vovk/shta/internal/storage"
+	"github.com/dmytro-vovk/shta/internal/types"
 )
 
 type Handlers struct {
@@ -11,7 +11,7 @@ type Handlers struct {
 
 type (
 	reader interface {
-		GetURLs(string, string) (*storage.URLList, error)
+		GetURLs(string, string) (*types.URLList, error)
 	}
 
 	writer interface {

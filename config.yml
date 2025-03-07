@@ -1,0 +1,13 @@
+---
+database:
+  host: postgres
+  port: 5432
+  user: appuser
+  pass: sEcRetPaSs8371238642
+  name: appdb
+webserver:
+  listen: 0.0.0.0:8080
+settings:
+  topUrls: 10
+  concurrencyLimit: 3
+  verifyEvery: 60s

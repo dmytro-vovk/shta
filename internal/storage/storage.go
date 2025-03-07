@@ -3,75 +3,82 @@ package storage
 import (
 	"fmt"
 	"log"
+	"slices"
+	"sort"
 
 	"github.com/dmytro-vovk/shta/internal/db"
+	"github.com/dmytro-vovk/shta/internal/types"
 )
 
 type Storage struct {
-	db *db.DB
+	db     *db.DB
+	counts Counter
 }
 
-func New(db *db.DB) *Storage {
+type Counter interface {
+	Add(string)
+	Get(string) int
+}
+
+func New(db *db.DB, counter Counter) *Storage {
 	return &Storage{
-		db: db,
+		db:     db,
+		counts: counter,
 	}
 }
 
 func (s *Storage) AddURL(url string) {
 	if err := s.db.UpsertURL(url); err != nil {
 		log.Printf("Error upsertting URL %q: %s", url, err)
+	} else {
+		s.counts.Add(url)
 	}
 }
 
-type URLList struct {
-	URLs []db.URLRecord `json:"urls"`
-	Sort struct {
-		Field     string `json:"field"`
-		Direction string `json:"direction"`
-	} `json:"sort"`
-}
+func (s *Storage) GetURLs(sortBy, sortOrder string) (*types.URLList, error) {
+	log.Printf("Getting URLs sorted by '%s' in %s order", sortBy, sortOrder)
 
-func (s *Storage) GetURLs(sortBy, sortDir string) (*URLList, error) {
+	urls, err := s.db.FetchURLs(50)
+	if err != nil {
+		return nil, fmt.Errorf("fetch urls: %w", err)
+	}
+
+	sorted := make([]types.URL, len(urls))
+
+	for i := range urls {
+		sorted[i] = types.URL{
+			URL:   urls[i].URL,
+			Count: s.counts.Get(urls[i].URL),
+			Seen:  urls[i].LastSeen,
+		}
+	}
+
 	var (
-		sort  string
-		order string
+		timeSort = func(i, j int) bool {
+			return sorted[i].Seen.After(sorted[j].Seen)
+		}
+		frequencySort = func(i, j int) bool {
+			return sorted[i].Count > sorted[j].Count
+		}
 	)
 
-	switch sortBy {
-	case "frequency":
-		sort = "seen"
-	case "time":
-		sort = "created_at"
-	default:
-		return nil, fmt.Errorf("unknown sort by: %q", sortBy)
+	switch {
+	case sortBy == "time":
+		sort.Slice(sorted, timeSort)
+	case sortBy == "frequency":
+		sort.Slice(sorted, frequencySort)
 	}
 
-	switch sortDir {
-	case "asc":
-		order = "ASC"
-	case "desc":
-		order = "DESC"
-	default:
-		return nil, fmt.Errorf("unknown sort direction: %q", sortDir)
+	if sortOrder == "asc" {
+		slices.Reverse(sorted)
 	}
 
-	log.Printf("Getting URLs sorted by '%s' in %s order", sort, order)
-
-	urls, err := s.db.FetchURLs(sort, order, 50)
-	if err != nil {
-		return nil, err
+	result := types.URLList{
+		URLs: sorted,
 	}
 
-	if urls == nil {
-		urls = []db.URLRecord{}
-	}
-
-	result := URLList{
-		URLs: urls,
-	}
-
-	result.Sort.Field = sortBy
-	result.Sort.Direction = sortDir
+	result.Sort.By = sortBy
+	result.Sort.Order = sortOrder
 
 	return &result, nil
 }

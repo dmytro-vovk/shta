@@ -7,6 +7,10 @@ start:
 	docker-compose up --build --detach
 
 .PHONY:
+watch:
+	docker-compose up --build
+
+.PHONY:
 stop:
 	docker-compose down
 
@@ -27,3 +31,6 @@ test:
 
 post:
 	curl -d 'http://example.com/' -X POST http://localhost:8080
+
+post2:
+	curl -d 'https://google.com/' -X POST http://localhost:8080

@@ -35,6 +35,8 @@ func (h *Handlers) LatestURLs(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "Invalid sort parameter: "+sort, http.StatusBadRequest)
 
+		log.Printf("Error: invalid sort parameter: %s", sort)
+
 		return
 	}
 
@@ -42,19 +44,16 @@ func (h *Handlers) LatestURLs(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 
-		log.Printf("get URLs: %s", err)
+		log.Printf("Error getting URLs: %s", err)
 
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-
-	if err := enc.Encode(data); err != nil {
+	if err := json.NewEncoder(w).Encode(data); err != nil {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 
-		log.Printf("encode URLs: %s", err)
+		log.Printf("Error encoding URLs: %s", err)
 	}
 }

@@ -16,7 +16,7 @@ func (h *Handlers) AddURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Processing new URL: %s", url)
+	log.Printf("Adding new URL: %s", url)
 
 	h.writer.AddURL(string(url))
 

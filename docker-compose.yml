@@ -7,7 +7,6 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
-      - redis
     volumes:
       - ./config.yml:/app/config.yml
     environment:
@@ -36,14 +35,6 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./scripts/migrations/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
-
-  redis:
-    image: redis:alpine
-    restart: always
-    ports:
-      - "6379:6379"
-    volumes:
-      - redisdata:/data
 
 volumes:
   pgdata:

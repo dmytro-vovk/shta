@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"os"
+	"time"
 
 	"github.com/dmytro-vovk/envset"
 	"gopkg.in/yaml.v3"
@@ -9,19 +11,32 @@ import (
 
 type Config struct {
 	Database  Database  `yaml:"database"`
-	Cache     Cache     `yaml:"cache"`
 	WebServer WebServer `yaml:"webserver"`
+	Settings  struct {
+		TopURLs          int           `default:"10"  yaml:"topUrls"`
+		ConcurrencyLimit int           `default:"3"   yaml:"concurrencyLimit"`
+		VerifyEvery      time.Duration `default:"10s" yaml:"verifyEvery"`
+	} `yaml:"settings"`
 }
 
 type Database struct {
-	Host     string `default:"localhost"            env:"DB_HOST"     yaml:"host"`
-	Port     string `default:"5432"                 env:"DB_PORT"     yaml:"port"`
-	User     string `default:"appuser"              env:"DB_USERNAME" yaml:"user"`
-	Password string `default:"sEcRetPaSs8371238642" env:"DB_PASSWORD" yaml:"pass"`
-	Name     string `default:"appdb"                env:"DB_NAME"     yaml:"name"`
+	Host     string `default:"localhost" env:"DB_HOST"     yaml:"host"`
+	Port     string `default:"5432"      env:"DB_PORT"     yaml:"port"`
+	User     string `default:"appuser"   env:"DB_USERNAME" yaml:"user"`
+	Password string `default:"-"         env:"DB_PASSWORD" yaml:"pass"`
+	Name     string `default:"appdb"     env:"DB_NAME"     yaml:"name"`
 }
 
-type Cache struct{}
+func (db Database) DSN() string {
+	return fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s?sslmode=disable",
+		db.User,
+		db.Password,
+		db.Host,
+		db.Port,
+		db.Name,
+	)
+}
 
 type WebServer struct {
 	Listen string `default:"0.0.0.0:8080" env:"LISTEN" yaml:"listen"`

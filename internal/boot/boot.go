@@ -2,7 +2,7 @@ package boot
 
 import (
 	"context"
-	"fmt"
+	_ "database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -11,11 +11,15 @@ import (
 	"time"
 
 	"github.com/dmytro-vovk/shta/internal/boot/config"
+	"github.com/dmytro-vovk/shta/internal/counter"
 	"github.com/dmytro-vovk/shta/internal/db"
+	"github.com/dmytro-vovk/shta/internal/fetcher"
 	"github.com/dmytro-vovk/shta/internal/filter"
+	"github.com/dmytro-vovk/shta/internal/periodic"
 	"github.com/dmytro-vovk/shta/internal/storage"
 	"github.com/dmytro-vovk/shta/internal/web"
 	"github.com/dmytro-vovk/shta/internal/web/handlers"
+	_ "github.com/lib/pq"
 )
 
 type Boot struct {
@@ -71,7 +75,20 @@ func (b *Boot) Filter() *filter.Filter {
 		return s
 	}
 
-	s := filter.New(b.Storage())
+	s := filter.New(b.Storage(), b.Fetcher())
+
+	b.Set(id, s, nil)
+
+	return s
+}
+
+func (b *Boot) Fetcher() *fetcher.Fetcher {
+	const id = "URL Fetcher"
+	if s, ok := b.Get(id).(*fetcher.Fetcher); ok {
+		return s
+	}
+
+	s := fetcher.New(b.Config().Settings.ConcurrencyLimit)
 
 	b.Set(id, s, nil)
 
@@ -127,7 +144,20 @@ func (b *Boot) Storage() *storage.Storage {
 		return s
 	}
 
-	s := storage.New(b.Database())
+	s := storage.New(b.Database(), b.Counter())
+
+	b.Set(id, s, nil)
+
+	return s
+}
+
+func (b *Boot) Counter() *counter.Counter {
+	const id = "Counter"
+	if s, ok := b.Get(id).(*counter.Counter); ok {
+		return s
+	}
+
+	s := counter.New(b.Config().Settings.TopURLs)
 
 	b.Set(id, s, nil)
 
@@ -145,16 +175,8 @@ func (b *Boot) Database() *db.DB {
 		err error
 	)
 
-	cfg := b.Config().Database
-
 	for {
-		if s, err = db.New(fmt.Sprintf(
-			"postgres://%s:%s@%s/%s?sslmode=disable",
-			cfg.User,
-			cfg.Password,
-			cfg.Host,
-			cfg.Name,
-		)); err != nil {
+		if s, err = db.New(b.Config().Database.DSN()); err != nil {
 			log.Printf("Error connecting to database: %s", err)
 
 			time.Sleep(5 * time.Second)
@@ -164,6 +186,21 @@ func (b *Boot) Database() *db.DB {
 
 		break
 	}
+
+	b.Set(id, s, nil)
+
+	return s
+}
+
+func (b *Boot) Verifier() *periodic.Verifier {
+	const id = "URL Verifier"
+	if s, ok := b.Get(id).(*periodic.Verifier); ok {
+		return s
+	}
+
+	log.Printf("Will verify URLs every %s", b.Config().Settings.VerifyEvery)
+
+	s := periodic.New(b.Counter(), b.Fetcher(), b.Config().Settings.VerifyEvery)
 
 	b.Set(id, s, nil)
 

@@ -11,16 +11,18 @@ func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	configPath := "config.yml"
-	if cfgPath := os.Getenv("CONFIG"); cfgPath != "" {
-		configPath = cfgPath
+	if envPath, ok := os.LookupEnv("CONFIG"); ok {
+		configPath = envPath
 	}
 
-	c, err := boot.New(configPath)
+	b, err := boot.New(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := c.Webserver().Serve(); err != nil {
+	b.Verifier()
+
+	if err := b.Webserver().Serve(); err != nil {
 		log.Fatal(err)
 	}
 }
