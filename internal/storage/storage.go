@@ -62,6 +62,10 @@ func (s *Storage) GetURLs(sortBy, sortDir string) (*URLList, error) {
 		return nil, err
 	}
 
+	if urls == nil {
+		urls = []db.URLRecord{}
+	}
+
 	result := URLList{
 		URLs: urls,
 	}
