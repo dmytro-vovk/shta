@@ -15,10 +15,7 @@ func main() {
 		configPath = envPath
 	}
 
-	b, err := boot.New(configPath)
-	if err != nil {
-		log.Fatal(err)
-	}
+	b := boot.New(configPath)
 
 	b.Verifier()
 

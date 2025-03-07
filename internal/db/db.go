@@ -1,10 +1,12 @@
 package db
 
 import (
+	_ "database/sql"
 	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 type DB struct {
