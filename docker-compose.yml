@@ -19,7 +19,7 @@ services:
       - DB_NAME=${DB_NAME:-appdb}
 
   postgres:
-    image: postgres:13
+    image: postgres:latest
     restart: always
     environment:
       # Default admin credentials
