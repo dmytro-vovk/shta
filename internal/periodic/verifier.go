@@ -36,20 +36,16 @@ func New(source LinkSourcer, fetcher Fetcher, interval time.Duration) *Verifier 
 func (v *Verifier) processor() {
 	for range time.Tick(v.interval) {
 		for _, url := range v.source.Top() {
-			go func(link string) {
-				start := time.Now()
-
-				resp, err := v.fetcher.Fetch(http.MethodGet, link)
-				if err != nil {
-					fmt.Printf("Failed to GET: %s ", link)
-				} else {
-					elapsed := time.Since(start).Truncate(100 * time.Millisecond)
-
-					_ = resp.Body.Close()
-
-					fmt.Printf("Got %d from %s in %s", resp.StatusCode, link, elapsed)
-				}
-			}(url)
+			go v.verifyURL(url)
 		}
+	}
+}
+
+func (v *Verifier) verifyURL(url string) {
+	resp, err := v.fetcher.Fetch(http.MethodGet, url)
+	if err != nil {
+		fmt.Printf("Failed to GET: %s ", url)
+	} else {
+		_ = resp.Body.Close()
 	}
 }

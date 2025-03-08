@@ -9,5 +9,5 @@ webserver:
   listen: 0.0.0.0:8080
 settings:
   topUrls: 10
-  concurrencyLimit: 3
+  httpConcurrencyLimit: 3
   verifyEvery: 60s

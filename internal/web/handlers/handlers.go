@@ -5,21 +5,21 @@ import (
 )
 
 type Handlers struct {
-	reader reader
-	writer writer
+	reader urlReader
+	writer urlWriter
 }
 
 type (
-	reader interface {
+	urlReader interface {
 		GetURLs(string, string) (*types.URLList, error)
 	}
 
-	writer interface {
+	urlWriter interface {
 		AddURL(string)
 	}
 )
 
-func New(reader reader, writer writer) *Handlers {
+func New(reader urlReader, writer urlWriter) *Handlers {
 	return &Handlers{
 		reader: reader,
 		writer: writer,

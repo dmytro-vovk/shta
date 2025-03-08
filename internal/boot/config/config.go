@@ -14,7 +14,7 @@ type Config struct {
 	WebServer WebServer `yaml:"webserver"`
 	Settings  struct {
 		TopURLs          int           `default:"10"  yaml:"topUrls"`
-		ConcurrencyLimit int           `default:"3"   yaml:"concurrencyLimit"`
+		ConcurrencyLimit int           `default:"3"   yaml:"httpConcurrencyLimit"`
 		VerifyEvery      time.Duration `default:"10s" yaml:"verifyEvery"`
 	} `yaml:"settings"`
 }
