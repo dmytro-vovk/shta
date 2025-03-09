@@ -3,24 +3,29 @@ package storage
 import (
 	"fmt"
 	"log"
-	"slices"
 	"sort"
 
-	"github.com/dmytro-vovk/shta/internal/db"
 	"github.com/dmytro-vovk/shta/internal/types"
 )
 
 type Storage struct {
-	db     *db.DB
+	db     database
 	counts Counter
 }
+
+type (
+	database interface {
+		UpsertURL(string) error
+		FetchURLs(int) ([]*types.URLRecord, error)
+	}
+)
 
 type Counter interface {
 	Add(string)
 	Get(string) int
 }
 
-func New(db *db.DB, counter Counter) *Storage {
+func New(db database, counter Counter) *Storage {
 	return &Storage{
 		db:     db,
 		counts: counter,
@@ -38,7 +43,7 @@ func (s *Storage) AddURL(url string) {
 func (s *Storage) GetURLs(sortBy, sortOrder string) (*types.URLList, error) {
 	log.Printf("Getting URLs sorted by '%s' in %s order", sortBy, sortOrder)
 
-	urls, err := s.db.FetchURLs(50)
+	urls, err := s.db.FetchURLs(50) // NOTE would be nice to have '50' configurable
 	if err != nil {
 		return nil, fmt.Errorf("fetch urls: %w", err)
 	}
@@ -55,17 +60,17 @@ func (s *Storage) GetURLs(sortBy, sortOrder string) (*types.URLList, error) {
 
 	switch sortBy {
 	case types.SortByTime:
-		sort.Slice(sorted, func(i, j int) bool {
-			return sorted[i].Seen.After(sorted[j].Seen)
-		})
+		if sortOrder == types.OrderAsc {
+			sort.Slice(sorted, func(i, j int) bool { return sorted[i].Seen.After(sorted[j].Seen) })
+		} else {
+			sort.Slice(sorted, func(i, j int) bool { return sorted[i].Seen.Before(sorted[j].Seen) })
+		}
 	case types.SortByFrequency:
-		sort.Slice(sorted, func(i, j int) bool {
-			return sorted[i].Count > sorted[j].Count
-		})
-	}
-
-	if sortOrder == types.OrderAsc {
-		slices.Reverse(sorted)
+		if sortOrder == types.OrderAsc {
+			sort.Slice(sorted, func(i, j int) bool { return sorted[i].Count < sorted[j].Count })
+		} else {
+			sort.Slice(sorted, func(i, j int) bool { return sorted[i].Count > sorted[j].Count })
+		}
 	}
 
 	result := types.URLList{

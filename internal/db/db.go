@@ -3,8 +3,8 @@ package db
 import (
 	_ "database/sql"
 	"fmt"
-	"time"
 
+	"github.com/dmytro-vovk/shta/internal/types"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -39,13 +39,8 @@ func (db *DB) UpsertURL(url string) error {
 	return err
 }
 
-type URLRecord struct {
-	URL      string    `db:"url"`
-	LastSeen time.Time `db:"last_seen"`
-}
-
-func (db *DB) FetchURLs(limit int) ([]*URLRecord, error) {
-	var data []*URLRecord
+func (db *DB) FetchURLs(limit int) ([]*types.URLRecord, error) {
+	var data []*types.URLRecord
 
 	if err := db.db.Select(
 		&data,
