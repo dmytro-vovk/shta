@@ -1,5 +1,7 @@
-[![CI](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml)
+[![Build](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/ci.yaml)
+[![Tests](https://github.com/dmytro-vovk/shta/actions/workflows/tests.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/tests.yaml)
 ![coverage](https://github.com/dmytro-vovk/shta/blob/master/coverage.svg)
+[![Dependabot Updates](https://github.com/dmytro-vovk/shta/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/dependabot/dependabot-updates)
 
 # Spamhaus Test Assignment
 
