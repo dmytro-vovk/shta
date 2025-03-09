@@ -2,6 +2,7 @@
 [![Lint](https://github.com/dmytro-vovk/shta/actions/workflows/lint.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/lint.yaml)
 [![Tests](https://github.com/dmytro-vovk/shta/actions/workflows/tests.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/tests.yaml)
 ![coverage](https://github.com/dmytro-vovk/shta/blob/master/coverage.svg)
+[![OpenAPI](https://github.com/dmytro-vovk/shta/actions/workflows/openapi.yaml/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/openapi.yaml)
 [![Dependabot Updates](https://github.com/dmytro-vovk/shta/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/dmytro-vovk/shta/actions/workflows/dependabot/dependabot-updates)
 
 # Spamhaus Test Assignment
