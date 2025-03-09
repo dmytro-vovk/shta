@@ -17,8 +17,10 @@ make start
 Then, API will be exposed at `http://localhost:8080`.
 
 Endpoints:
- - `GET /v1/urls` -- returns list of last 50 URLs, supports `sort` and `order` parameters, both optional, e.g. `GET /v1/urls?sort=frequency&order=asc` or `GET /v1/urls?sort=time&order=desc` 
- - `POST /v1/urls` -- adds/updates new/existing URL from request body
+ - `GET /v1/urls` -- returns list of last 50 URLs, supports optional `sort` and `order` parameters. 
+ - `POST /v1/urls` -- adds new or updates existing URL from request body.
+
+Full API specification can be found in file [openapi.yaml](openapi.yaml).
 
 ### Adding a new URL
 
@@ -50,7 +52,7 @@ make stop
 - `make clean` -- performs docker system prune, removing stopped & unused stuff.
 - `make lint` -- runs Go metalinter using config `.golangci.yml`.
 - `make test` -- runs tests of all packages three times with data race detection and coverage output.
-- `make coverage` -- generates test coverage badge.
+- `make coverage` -- generates test coverage badge (`coverage.svg`).
 
 ## Configuration
 
@@ -131,3 +133,5 @@ The better approach would be to have a stateless app, so that any number of inst
 making it horisontally scalable and allowing zero service downtime with continuous delivery.  
 
 Potentially, Redis could be used instead of in-memory cache counter. 
+
+It is unclear what "from the smallest to the biggest" means referring to URLs, so I implemented it as the number of URL submissions. 

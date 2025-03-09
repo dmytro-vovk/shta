@@ -1,0 +1,16 @@
+name: OpenAPI
+
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions: read-all
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate
+        uses: mbowman100/swagger-validator-action@master
+        with:
+          files: ['openapi.yaml']

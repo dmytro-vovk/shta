@@ -1,0 +1,78 @@
+openapi: 3.0.4
+info:
+  title: Spamhaus test assignment
+  description: Implementation of testing assignment by [Dmytro Vovk](https://github.com/dmytro-vovk/shta).
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8080/v1
+    description: Base URL of the app.
+
+paths:
+  /urls:
+    get:
+      summary: Returns a list of last 50 URLs.
+      parameters:
+        - in: query
+          name: sort
+          description: How to sort the returned list of URLs.
+          required: false
+          schema:
+            enum: ["frequency", "time"]
+        - in: query
+          name: order
+          description: Order of sorting.
+          required: false
+          schema:
+            enum: ["asc", "desc"]
+      responses:
+        "200":
+          description: A JSON structure
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  urls:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        url:
+                          type: string
+                        count:
+                          type: integer
+                      required:
+                        - url
+                        - count
+                  sort:
+                    type: object
+                    properties:
+                      by:
+                        type: string
+                      order:
+                        type: string
+                    required:
+                      - by
+                      - order
+                required:
+                  - urls
+                  - sort
+        "400":
+          description: Some of the request parameters are not valid.
+        "500":
+          description: Internal server error occurred.
+    post:
+      summary: Adds or updates a URL.
+      requestBody:
+        description: A single URL as plain text.
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        "202":
+          description: The URL was accepted for processing.
+        "400":
+          description: Submitted URL is not valid or read error occurred.
