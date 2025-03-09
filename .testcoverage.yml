@@ -1,0 +1,9 @@
+profile: cover.out
+
+exclude:
+  paths:
+    - ^cmd
+    - ^internal/boot
+    - ^internal/db
+    - ^internal/types
+    - ^internal/web$

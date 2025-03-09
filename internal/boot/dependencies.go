@@ -11,8 +11,8 @@ import (
 	"github.com/dmytro-vovk/shta/internal/db"
 	"github.com/dmytro-vovk/shta/internal/fetcher"
 	"github.com/dmytro-vovk/shta/internal/filter"
-	"github.com/dmytro-vovk/shta/internal/periodic"
 	"github.com/dmytro-vovk/shta/internal/storage"
+	"github.com/dmytro-vovk/shta/internal/verifier"
 	"github.com/dmytro-vovk/shta/internal/web"
 	"github.com/dmytro-vovk/shta/internal/web/handlers"
 )
@@ -109,8 +109,8 @@ func (b *Boot) Router() http.Handler {
 	m := http.NewServeMux()
 	h := handlers.New(b.Storage(), b.Filter())
 
-	m.HandleFunc("POST /", h.AddURL)
-	m.HandleFunc("GET /", h.LatestURLs)
+	m.HandleFunc("POST /v1/urls", h.AddURL)
+	m.HandleFunc("GET /v1/urls", h.LatestURLs)
 
 	s := http.Handler(m)
 
@@ -132,15 +132,15 @@ func (b *Boot) Storage() *storage.Storage {
 	return s
 }
 
-func (b *Boot) Verifier() *periodic.Verifier {
+func (b *Boot) Verifier() *verifier.Verifier {
 	const id = "URL Verifier"
-	if s, ok := b.Get(id).(*periodic.Verifier); ok {
+	if s, ok := b.Get(id).(*verifier.Verifier); ok {
 		return s
 	}
 
 	log.Printf("Will verify URLs every %s", b.Config().Settings.VerifyEvery)
 
-	s := periodic.New(b.Counter(), b.Fetcher(), b.Config().Settings.VerifyEvery)
+	s := verifier.New(b.Counter(), b.Fetcher(), b.Config().Settings.VerifyEvery)
 
 	b.Set(id, s, nil)
 

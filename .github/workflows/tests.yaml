@@ -1,15 +1,11 @@
-name: Build
+name: Tests
 
-on:
-  workflow_run:
-    workflows: ["Lint", "Tests"]
-    branches: [master]
-    types:
-      - completed
+on: [push]
 
 jobs:
-  on-success:
+  tests:
     runs-on: ubuntu-latest
+    permissions: read-all
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -18,7 +14,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-          cache: true
+          cache: false
 
-      - name: Build
-        run: make build
+      - name: Run unit testing
+        run: make test

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -34,9 +35,10 @@ func (f *Fetcher) Fetch(method, url string) (resp *http.Response, err error) {
 
 	defer func() {
 		if resp != nil {
-			fmt.Printf("Got %d from %s in %s\n", resp.StatusCode, url, time.Since(start))
+			// fmt.Printf() by default outputs to STDOUT, but fmt.Fprintf(os.Stdout, ...) is more explicit
+			_, _ = fmt.Fprintf(os.Stdout, "Got %d from %s in %s\n", resp.StatusCode, url, time.Since(start))
 		} else {
-			fmt.Printf("Failed %s %s\n", method, url)
+			_, _ = fmt.Fprintf(os.Stdout, "Failed %s %s\n", method, url)
 		}
 	}()
 

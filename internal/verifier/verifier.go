@@ -1,4 +1,4 @@
-package periodic
+package verifier
 
 import (
 	"fmt"

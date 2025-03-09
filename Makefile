@@ -1,36 +1,35 @@
-.PHONY:
+.PHONY: build
 build:
 	go build -v ./...
 
-.PHONY:
+.PHONY: start
 start:
 	docker-compose up --build --detach
 
-.PHONY:
+.PHONY: watch
 watch:
 	docker-compose up --build
 
-.PHONY:
+.PHONY: stop
 stop:
 	docker-compose down
 
-.PHONY:
+.PHONY: restart
 restart: stop start
 
-.PHONY:
+.PHONY: clean
 clean:
 	docker system prune -a
 
-.PHONY:
+.PHONY: lint
 lint:
 	golangci-lint run
 
-.PHONY:
+.PHONY: test
 test:
 	@go test -race -cover -count=3 ./...
 
-post:
-	curl -d 'http://example.com/' -X POST http://localhost:8080
-
-post2:
-	curl -d 'https://google.com/' -X POST http://localhost:8080
+.PHONY: coverage
+coverage:
+	go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+	go-test-coverage --config=./.testcoverage.yml --badge-file-name=coverage.svg
