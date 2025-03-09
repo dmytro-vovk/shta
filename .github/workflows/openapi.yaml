@@ -13,4 +13,5 @@ jobs:
       - name: Validate
         uses: mbowman100/swagger-validator-action@master
         with:
-          files: ['openapi.yaml']
+          files: |
+            openapi.yaml
