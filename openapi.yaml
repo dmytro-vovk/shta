@@ -1,4 +1,4 @@
-openapi: 3.0.4
+openapi: 3.0.3
 info:
   title: Spamhaus test assignment
   description: Implementation of testing assignment by [Dmytro Vovk](https://github.com/dmytro-vovk/shta).
