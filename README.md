@@ -95,6 +95,7 @@ graph TD
     storage --> db
     storage --> counter
     filter --> fetcher
+    filter --> storage
     
     verifier --> counter
     verifier --> fetcher
